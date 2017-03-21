@@ -1,3 +1,4 @@
+require 'pry'
 class Tournament
   attr_reader :games
   def initialize(games)
@@ -5,17 +6,37 @@ class Tournament
   end
   
   def self.tally(games)
-    Tournament.new(games)
-    expected = <<-TALLY.gsub(/^ */, '')
+    tournament = Tournament.new(games)
+    tournament.process_games
+    tournament.format_table
+    # binding.pry
+    # expected = <<-TALLY.gsub(/^ */, '')
+    #   Team                           | MP |  W |  D |  L |  P
+    #   Devastating Donkeys            |  3 |  2 |  1 |  0 |  7
+    #   Allegoric Alaskans             |  3 |  2 |  0 |  1 |  6
+    #   Blithering Badgers             |  3 |  1 |  0 |  2 |  3
+    #   Courageous Californians        |  3 |  0 |  1 |  2 |  1
+    # TALLY
+  end
+  
+  def format_table
+    # result is sorted by points
+    team = Team.find_by_name("Devastating Donkeys")
+    table = <<-TABLE.gsub(/^ */, '')
       Team                           | MP |  W |  D |  L |  P
       Devastating Donkeys            |  3 |  2 |  1 |  0 |  7
       Allegoric Alaskans             |  3 |  2 |  0 |  1 |  6
       Blithering Badgers             |  3 |  1 |  0 |  2 |  3
       Courageous Californians        |  3 |  0 |  1 |  2 |  1
-    TALLY
+    TABLE
+    [
+     "Team                           | MP |  W |  D |  L |  P",
+     "Devastating Donkeys            |  #{team.games_played} |  #{team.wins} |  #{team.draws} |  #{team.losses} |  #{team.points}"
+    ]
+    binding.pry
+    # a = "Team                           | MP |  W |  D |  L |  P"
+    # b = "Devastating Donkeys            |  #{team.games_played} |  #{team.wins} |  #{team.draws} |  #{team.losses} |  #{team.points}"
   end
-  
-
   
   def process_games
     create_teams
@@ -30,6 +51,8 @@ class Tournament
         team_1.loss
         team_2.win
       else
+        team_1.draw
+        team_2.draw
       end
     end
   end
@@ -52,15 +75,13 @@ end
 
 class Team
   @@teams ||= []
-  attr_reader :name
+  attr_reader :name, :wins, :draws, :losses
   def initialize(name)
     @name = name
     @@teams << self
     @wins = 0
     @losses = 0
-    # @draws
-    # @points
-    # @games_played
+    @draws = 0
   end
   
   def win
@@ -69,6 +90,18 @@ class Team
   
   def loss
     @losses += 1
+  end
+  
+  def draw
+    @draws += 1
+  end
+  
+  def points
+    @wins * 3 + @draws
+  end
+  
+  def games_played
+    @wins + @losses + @draws
   end
   
   def self.all
@@ -86,4 +119,4 @@ end
 # handle input
 # turn into something i want to use
 # perform calculation
-
+# format output
