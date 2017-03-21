@@ -15,6 +15,25 @@ class Tournament
     TALLY
   end
   
+
+  
+  def process_games
+    create_teams
+    @games.split("\n").each do |game|
+      game = game.split(";")
+      team_1 = Team.find_by_name(game[0])
+      team_2 = Team.find_by_name(game[1])
+      if game[2] == "win"
+        team_1.win
+        team_2.loss
+      elsif game[2] == "loss"
+        team_1.loss
+        team_2.win
+      else
+      end
+    end
+  end
+  
   def team_list
     @games.split("\n").map do |game|
       game_arr = game.split(";")
@@ -28,32 +47,14 @@ class Tournament
     end
   end
   
-  def process_games
-    @games.split("\n").each do |game|
-      game = game.split(";")
-      team_1 = Team.find_by_name(game[0])
-      team_2 = Team.find_by_name(game[1])
-      require 'pry'
-      binding.pry
-      if game[2] == "win"
-        team_1.win
-        team_2.loss
-      elsif game[2] == "loss"
-        team_1.loss
-        team_2.win
-      else
-      end
-    end
-  end
-  
     
 end
 
 class Team
+  @@teams ||= []
   attr_reader :name
   def initialize(name)
     @name = name
-    @@teams ||= []
     @@teams << self
     @wins = 0
     @losses = 0
