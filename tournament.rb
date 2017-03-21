@@ -28,14 +28,24 @@ class Tournament
     end
   end
   
+  def process_games
+    @games.split("\n").each do |game|
+      game = game.split(";")
+      team_1 = Team.find_by_name(game[0])
+      team_2 = Team.find_by_name(game[1])
+      require 'pry'
+      binding.pry
+      if game[2] == "win"
+        team_1.win
+        team_2.loss
+      elsif game[2] == "loss"
+        team_1.loss
+        team_2.win
+      else
+      end
+    end
+  end
   
-      
-  
-  # def process_games
-  #   hash = {}
-  #   @games.split("\n").each do |game|
-  #     if game[2] == "win"
-  #       hash[game[0] 
     
 end
 
@@ -45,19 +55,31 @@ class Team
     @name = name
     @@teams ||= []
     @@teams << self
-    # @wins
-    # @losses
+    @wins = 0
+    @losses = 0
     # @draws
     # @points
     # @games_played
   end
   
-  def self.teams
+  def win
+    @wins += 1
+  end
+  
+  def loss
+    @losses += 1
+  end
+  
+  def self.all
     @@teams
   end
   
   def self.team_names
     @@teams.map {|team| team.name}
+  end
+  
+  def self.find_by_name(name)
+    @@teams.find {|team| team.name == name}
   end
 end
 # handle input
