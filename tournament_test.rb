@@ -48,7 +48,7 @@ class TournamentTest < Minitest::Test
   end
 
   def test_ties_broken_alphabetically
-    skip
+    
     input = <<-INPUT.gsub(/^ */, '')
       Courageous Californians;Devastating Donkeys;win
       Allegoric Alaskans;Blithering Badgers;win
@@ -86,7 +86,6 @@ class TournamentTest < Minitest::Test
   # http://ruby-doc.org/docs/ruby-doc-bundle/UsersGuide/rg/constants.html
 
   def test_bookkeeping
-    skip
     assert_equal 1, BookKeeping::VERSION
   end
 end
