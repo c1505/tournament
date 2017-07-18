@@ -6,36 +6,29 @@ class Tournament
   end
   
   def self.tally(games)
+    Team.reset
     tournament = Tournament.new(games)
     tournament.process_games
     tournament.format_table
-    # binding.pry
-    # expected = <<-TALLY.gsub(/^ */, '')
-    #   Team                           | MP |  W |  D |  L |  P
-    #   Devastating Donkeys            |  3 |  2 |  1 |  0 |  7
-    #   Allegoric Alaskans             |  3 |  2 |  0 |  1 |  6
-    #   Blithering Badgers             |  3 |  1 |  0 |  2 |  3
-    #   Courageous Californians        |  3 |  0 |  1 |  2 |  1
-    # TALLY
   end
   
   def format_table
-    # result is sorted by points
-    team = Team.find_by_name("Devastating Donkeys")
-    table = <<-TABLE.gsub(/^ */, '')
+    teams = Team.all.sort_by {|team| team.points}.reverse
+    table = teams.map do |team|
+      padding_length = 31 - team.name.length
+      padding = " " * padding_length
+      "#{team.name}#{padding}|  #{team.games_played} |  #{team.wins} |  #{team.draws} |  #{team.losses} |  #{team.points}"
+    end
+    table.unshift("Team                           | MP |  W |  D |  L |  P")
+    t1 = <<-TABLE.gsub(/^ */, '')
       Team                           | MP |  W |  D |  L |  P
       Devastating Donkeys            |  3 |  2 |  1 |  0 |  7
       Allegoric Alaskans             |  3 |  2 |  0 |  1 |  6
       Blithering Badgers             |  3 |  1 |  0 |  2 |  3
       Courageous Californians        |  3 |  0 |  1 |  2 |  1
     TABLE
-    [
-     "Team                           | MP |  W |  D |  L |  P",
-     "Devastating Donkeys            |  #{team.games_played} |  #{team.wins} |  #{team.draws} |  #{team.losses} |  #{team.points}"
-    ]
-    binding.pry
-    # a = "Team                           | MP |  W |  D |  L |  P"
-    # b = "Devastating Donkeys            |  #{team.games_played} |  #{team.wins} |  #{team.draws} |  #{team.losses} |  #{team.points}"
+    table[-1] = table[-1] + "\n"
+    table.join("\n")
   end
   
   def process_games
@@ -84,6 +77,10 @@ class Team
     @draws = 0
   end
   
+  def self.reset
+    @@teams =[]
+  end
+  
   def win
     @wins += 1
   end
@@ -116,7 +113,4 @@ class Team
     @@teams.find {|team| team.name == name}
   end
 end
-# handle input
-# turn into something i want to use
-# perform calculation
-# format output
+
